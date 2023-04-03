@@ -1,5 +1,6 @@
 package file.upload.exam.multipart.api;
 
+import file.upload.exam.multipart.domain.dto.ImgUploadResponse;
 import file.upload.exam.multipart.domain.dto.SimpleImgResponse;
 import file.upload.exam.multipart.domain.model.FileData;
 import file.upload.exam.multipart.domain.repository.FileRepository;
@@ -23,12 +24,13 @@ public class FileService {
     private final FileRepository fileRepository;
 
     private static final String LOCAL_PATH = "C:\\Users\\Student\\Desktop\\study\\imgs\\";
+    private static final String HOME_PATH = "C:\\Users\\bae\\Desktop\\study\\imgs";
 
     private Long sequence = 1L;
 
-    public String uploadImage(final MultipartFile file) throws IOException {
+    public ImgUploadResponse uploadImage(final MultipartFile file) throws IOException {
         String uuid = UUID.randomUUID().toString();
-        String path = LOCAL_PATH + uuid;
+        String path = HOME_PATH + uuid;
         FileData fileData = FileData.builder()
                 .name(uuid)
                 .type(file.getContentType())
@@ -40,8 +42,10 @@ public class FileService {
         file.transferTo(new File(path));
 
         if (fileData != null) {
-            fileRepository.save(fileData);
-            return "file upload pass is " + path;
+            FileData savedFile = fileRepository.save(fileData);
+            return ImgUploadResponse.builder()
+                    .targetId(savedFile.getId())
+                    .build();
         } else {
             throw new IOException("파일을 업로드할 수 없습니다.");
         }
