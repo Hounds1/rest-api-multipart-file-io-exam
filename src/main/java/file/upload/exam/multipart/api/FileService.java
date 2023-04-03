@@ -1,6 +1,7 @@
 package file.upload.exam.multipart.api;
 
 import file.upload.exam.multipart.domain.dto.ImgUploadResponse;
+import file.upload.exam.multipart.domain.dto.PathAndTypeDTO;
 import file.upload.exam.multipart.domain.dto.SimpleImgResponse;
 import file.upload.exam.multipart.domain.model.FileData;
 import file.upload.exam.multipart.domain.repository.FileRepository;
@@ -13,7 +14,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -26,7 +29,7 @@ public class FileService {
     private static final String LOCAL_PATH = "C:\\Users\\Student\\Desktop\\study\\imgs\\";
     private static final String HOME_PATH = "C:\\Users\\bae\\Desktop\\study\\imgs";
 
-    private Long sequence = 1L;
+    private static final String STORE_NAME = "TestStore";
 
     public ImgUploadResponse uploadImage(final MultipartFile file) throws IOException {
         String uuid = UUID.randomUUID().toString();
@@ -35,7 +38,7 @@ public class FileService {
                 .name(uuid)
                 .type(file.getContentType())
                 .filePath(path)
-                .targetId(sequence++)
+                .storeName(STORE_NAME)
                 .build();
 
 
@@ -43,17 +46,18 @@ public class FileService {
 
         if (fileData != null) {
             FileData savedFile = fileRepository.save(fileData);
+            log.info("[{}]", savedFile.getFilePath());
             return ImgUploadResponse.builder()
-                    .targetId(savedFile.getId())
+                    .filePath(savedFile.getFilePath())
                     .build();
         } else {
             throw new IOException("파일을 업로드할 수 없습니다.");
         }
     }
 
-    public SimpleImgResponse download(final Long targetId) throws IOException {
-        FileData fileData = fileRepository.findByTargetId(targetId).orElseThrow(
-                () -> new IllegalStateException("가져올 수 없음")
+    public SimpleImgResponse download(final String filePath) throws IOException {
+        FileData fileData = fileRepository.findByFilePath(filePath).orElseThrow(
+                () -> new IllegalStateException("가져올 수 없는 상태")
         );
 
         String path = fileData.getFilePath();
@@ -65,5 +69,11 @@ public class FileService {
                 .build();
 
         return response;
+    }
+
+    public List<PathAndTypeDTO> findAllByStoreName(final String storeName) {
+        List<FileData> allByStoreName = fileRepository.findAllByStoreName(storeName);
+
+        return allByStoreName.stream().map(fileData -> PathAndTypeDTO.of(fileData)).collect(Collectors.toList());
     }
 }

@@ -22,5 +22,5 @@ public class FileData {
 
     private String filePath;
 
-    private Long targetId;
+    private String storeName;
 }
