@@ -33,7 +33,7 @@ public class FileService {
 
     public ImgUploadResponse uploadImage(final MultipartFile file) throws IOException {
         String uuid = UUID.randomUUID().toString();
-        String path = HOME_PATH + uuid;
+        String path = LOCAL_PATH + uuid;
         FileData fileData = FileData.builder()
                 .name(uuid)
                 .type(file.getContentType())
@@ -46,17 +46,17 @@ public class FileService {
 
         if (fileData != null) {
             FileData savedFile = fileRepository.save(fileData);
-            log.info("[{}]", savedFile.getFilePath());
+            log.info("[{}]", savedFile.getName());
             return ImgUploadResponse.builder()
-                    .filePath(savedFile.getFilePath())
+                    .fileName(savedFile.getName())
                     .build();
         } else {
             throw new IOException("파일을 업로드할 수 없습니다.");
         }
     }
 
-    public SimpleImgResponse download(final String filePath) throws IOException {
-        FileData fileData = fileRepository.findByFilePath(filePath).orElseThrow(
+    public SimpleImgResponse download(final String fileName) throws IOException {
+        FileData fileData = fileRepository.findByName(fileName).orElseThrow(
                 () -> new IllegalStateException("가져올 수 없는 상태")
         );
 

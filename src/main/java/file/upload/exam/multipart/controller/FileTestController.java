@@ -28,8 +28,8 @@ public class FileTestController {
     }
 
     @GetMapping("/api/v1/files")
-    public ResponseEntity<?> download(@RequestParam(name = "filePath") final String filePath) throws IOException {
-        SimpleImgResponse response = fileService.download(filePath);
+    public ResponseEntity<?> download(@RequestParam(name = "fileName") final String fileName) throws IOException {
+        SimpleImgResponse response = fileService.download(fileName);
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.valueOf(response.getContentType()))
                 .body(response.getFile());

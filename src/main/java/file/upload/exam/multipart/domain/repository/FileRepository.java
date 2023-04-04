@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface FileRepository extends JpaRepository<FileData, Long> {
 
-    Optional<FileData> findByFilePath(final String filePath);
+    Optional<FileData> findByName(final String fileName);
 
     List<FileData> findAllByStoreName(final String storeName);
 }

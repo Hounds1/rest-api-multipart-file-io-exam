@@ -10,13 +10,13 @@ import lombok.*;
 @Builder
 public class PathAndTypeDTO {
 
-    private String filePath;
+    private String fileName;
 
     private String contentType;
 
     public static PathAndTypeDTO of(final FileData fileData) {
         return PathAndTypeDTO.builder()
-                .filePath(fileData.getFilePath())
+                .fileName(fileData.getName())
                 .contentType(fileData.getType())
                 .build();
     }

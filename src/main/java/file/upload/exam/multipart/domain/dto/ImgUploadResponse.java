@@ -9,5 +9,5 @@ import lombok.*;
 @Builder
 public class ImgUploadResponse {
 
-    private String filePath;
+    private String fileName;
 }
